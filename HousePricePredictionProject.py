@@ -34,10 +34,10 @@ def build_pipeline(num_attribs, cat_attribs):
     return full_pipeline
 
 if not os.path.exists(MODEL_FILE) or not os.path.exists(PIPELINE_FILE):
-    # 1. Load the data
+    
     housing = pd.read_csv("housing.csv")
 
-    # 2. Create a stratified test set based on income category
+    
     housing["income_cat"] = pd.cut(
         housing["median_income"],
         bins=[0., 1.5, 3.0, 4.5, 6., np.inf],
@@ -50,25 +50,25 @@ if not os.path.exists(MODEL_FILE) or not os.path.exists(PIPELINE_FILE):
         housing=housing.loc[train_index].drop("income_cat", axis=1)
         
 
-    # 3. Separate predictors and labels
+    
     housing_labels = housing["median_house_value"].copy()
     housing_features = housing.drop("median_house_value", axis=1)
 
-    # 4. Separate numerical and categorical columns
+   
     num_attribs = housing_features.drop("ocean_proximity", axis=1).columns.tolist()
     cat_attribs = ["ocean_proximity"]
 
-    # 5. Build the pipeline
+    
     full_pipeline = build_pipeline(num_attribs, cat_attribs)
     
 
-    # 6. Transform the data
+    
     housing_prepared = full_pipeline.fit_transform(housing_features)
 
     model= RandomForestRegressor(random_state=42)
     model.fit(housing_prepared, housing_labels)
 
-    # Save the pipeline
+    
     joblib.dump(full_pipeline, PIPELINE_FILE)
     joblib.dump(model, MODEL_FILE)
     print("Model and pipeline saved.")
